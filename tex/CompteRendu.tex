@@ -1,0 +1,450 @@
+\documentclass[french, 10pt, a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[margin=2cm]{geometry}
+\usepackage{babel}
+
+\setlength{\parindent}{0pt}
+
+\usepackage{minted}
+\setminted[ocaml]{
+	tabsize=2,
+	breaklines,
+}
+
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	urlcolor=cyan,
+	pdfauthor=Mathias Rivet,
+}
+
+\usepackage{array}
+
+\title{Compte-rendu du projet Comment voter ?}
+\author{
+	Mathias Rivet
+}
+
+
+
+\begin{document}
+	\maketitle
+	\tableofcontents
+
+
+
+\section{Scrutin uninominal}
+
+\subsection{Question 1}
+
+\begin{minted}[frame=single]{ocaml}
+type candidat = string;; (* Réstriction aux chaînes représentants un candidat. *)
+type bulletin = candidat;;
+type urne = bulletin list;;
+type score = int;; (* Réstriction aux entiers positifs. *)
+type panel = candidat list;;
+\end{minted}
+
+
+
+\subsection{Question 2}
+
+\paragraph{Spécification}
+
+\begin{center}
+	\begin{tabular}{|p{2cm}|p{\dimexpr\linewidth-2cm-4\tabcolsep-3\arrayrulewidth}|}
+		\hline
+		Sémantique
+		&
+		\mintinline{ocaml}{compte c u} renvoie le score d'un candidat \mintinline{ocaml}{c} pour une urne \mintinline{ocaml}{u}. %La fonction est récursive et utilise le pattern matching.
+%
+		\\
+		\hline
+		Profile
+		&
+		\mintinline{ocaml}{compte: candidat -> urne -> score}
+%
+		\\
+		\hline
+		Exemple
+		&
+		\begin{minted}{ocaml}
+compte "Eric" ["Eric"; "Eric"; "Mathias"] = 2
+compte "Mathias" ["Eric"; "Eric"] = 0
+		\end{minted}
+%
+		\\
+		\hline
+	\end{tabular}
+\end{center}
+
+\paragraph{Implémentation}
+
+\begin{minted}[frame=single]{ocaml}
+let rec compte (c: candidat) (u: urne) : score =
+	match u with
+	| [] -> 0
+	| t::q -> if t=c then 1+(compte c q) else (compte c q);;
+\end{minted}
+
+
+
+\subsection{Question 3}
+
+\paragraph{Spécification}
+
+\begin{center}
+	\begin{tabular}{|p{2cm}|p{\dimexpr\linewidth-2cm-4\tabcolsep-3\arrayrulewidth}|}
+		\hline
+		Sémantique
+		&
+		\mintinline{ocaml}{depouiller lc u} renvoie la liste des scores par candidat à partir d'un panel \mintinline{ocaml}{lc} et d'une urne \mintinline{ocaml}{u}. %La fonction est récursive et utilise le pattern matching. Le résultat est une liste de couples \mintinline{ocaml}{candidat*score} de type \mintinline{ocaml}{resultat}.
+%
+		\\
+		\hline
+		Profile
+		&
+		\mintinline{ocaml}{depouiller: panel -> urne -> resultat list}
+%
+		\\
+		\hline
+		Exemple
+		&
+		\begin{minted}{ocaml}
+depouiller ["Eric"; "Mathias"] ["Eric"; "Eric"; "Mathias"] = [("Eric", 2); ("Mathias", 1)]
+depouiller ["Eric"; "Mathias"] ["Eric"; "Eric"] = [("Eric", 2); ("Mathias", 0)]
+		\end{minted}
+%
+		\\
+		\hline
+	\end{tabular}
+\end{center}
+
+\paragraph{Implémentation}
+
+\begin{minted}[frame=single]{ocaml}
+type resultat = candidat*score;;
+let rec depouiller (lc: panel) (u: urne) : resultat list =
+	match lc with
+	| [] -> []
+	| t::q -> (t, compte t u)::(depouiller q u);;
+\end{minted}
+
+
+
+\subsection{Question 4}
+
+\paragraph{Spécification}
+
+\begin{center}
+	\begin{tabular}{|p{2cm}|p{\dimexpr\linewidth-2cm-4\tabcolsep-3\arrayrulewidth}|}
+		\hline
+		Sémantique
+		&
+		\mintinline{ocaml}{union r1 r2} renvoie l'union de deux résultats \mintinline{ocaml}{r1} et \mintinline{ocaml}{r2} pour un même candidat. La fonction renvoie une erreur si les candidats sont différents. %Le résultat est un couple \mintinline{ocaml}{candidat*score} de type \mintinline{ocaml}{resultat}.
+%
+		\\
+		\hline
+		Profile
+		&
+		\mintinline{ocaml}{union: resultat -> resultat -> resultat}
+%
+		\\
+		\hline
+		Exemple
+		&
+		\begin{minted}{ocaml}
+union ("Eric", 2) ("Eric", 7) = ("Eric", 9)
+union ("Eric", 7) ("Mathias", 2) = "Les candidats sont différents."
+		\end{minted}
+%
+		\\
+		\hline
+	\end{tabular}
+\end{center}
+
+\paragraph{Implémentation}
+
+\begin{minted}[frame=single]{ocaml}
+let union (r1: resultat) (r2: resultat) : resultat =
+	let (c1, s1)=r1 and (c2, s2)=r2 in
+	if c1=c2 then (c1, s1+s2) else failwith "Les candidats sont différents.";;
+\end{minted}
+
+
+
+\subsection{Question 5}
+
+\paragraph{Spécification}
+
+\begin{center}
+	\begin{tabular}{|p{2cm}|p{\dimexpr\linewidth-2cm-4\tabcolsep-3\arrayrulewidth}|}
+		\hline
+		Sémantique
+		&
+		\mintinline{ocaml}{max_depouiller l} renvoie le résultat du candidat qui possède le meilleur score parmi les éléments présents dans la liste de résultat \mintinline{ocaml}{l}. La fonction renvoie une erreur si la liste est vide. %La fonction est récursive et utilise le pattern matching. Le résultat est un couple \mintinline{ocaml}{candidat*score} de type \mintinline{ocaml}{resultat}.
+%
+		\\
+		\hline
+		Profile
+		&
+		\mintinline{ocaml}{max_depouiller: resultat list -> resultat}
+%
+		\\
+		\hline
+		Exemple
+		&
+		\begin{minted}{ocaml}
+max_depouiller [("Eric", 7); ("Mathias", 2)] = ("Eric", 7)
+max_depouiller [] = "Il n'y à pas de résultat."
+		\end{minted}
+%
+		\\
+		\hline
+	\end{tabular}
+\end{center}
+
+\paragraph{Implémentation}
+
+\begin{minted}[frame=single]{ocaml}
+let rec max_depouiller (l: resultat list) : resultat =
+	match l with
+	| [] -> failwith "Il n'y à pas de résultat."
+	| [e] -> e
+	| t::q -> let (c1, s1)=t and (c2, s2)=(max_depouiller q) in
+		if s1>s2 then t else (c2, s2);;
+\end{minted}
+
+
+
+\subsection{Question 6}
+
+\paragraph{Spécification}
+
+\begin{center}
+	\begin{tabular}{|p{2cm}|p{\dimexpr\linewidth-2cm-4\tabcolsep-3\arrayrulewidth}|}
+		\hline
+		Sémantique
+		&
+		\mintinline{ocaml}{vainqueur_scrutin_uninominal u lc} renvoie le candidat qui possède le meilleur score parmi les bulletins d'une urne \mintinline{ocaml}{u} et les candidats d'un panel \mintinline{ocaml}{lc}. La fonction renvoie une erreur si le panel est vide. %La fonction utilise des fonctions définis précédemment.
+%
+		\\
+		\hline
+		Profile
+		&
+		\mintinline{ocaml}{vainqueur_scrutin_uninominal: urne -> panel -> candidat}
+%
+		\\
+		\hline
+		Exemple
+		&
+		\begin{minted}{ocaml}
+vainqueur_scrutin_uninominal ["Eric"; "Eric"; "Mathias"] ["Eric"; "Mathias"] = "Eric"
+vainqueur_scrutin_uninominal ["Eric"; "Eric"; "Mathias"] [] = "Il n'y à pas de résultat."
+		\end{minted}
+%
+		\\
+		\hline
+	\end{tabular}
+\end{center}
+
+\paragraph{Implémentation}
+
+\begin{minted}[frame=single]{ocaml}
+let vainqueur_scrutin_uninominal (u: urne) (lc: panel) : candidat =
+	let (c, s)=max_depouiller (depouiller lc u) in c;;
+\end{minted}
+
+
+
+\subsection{Question 7}
+
+\paragraph{Spécification suppr\_elem}
+
+\begin{center}
+	\begin{tabular}{|p{2cm}|p{\dimexpr\linewidth-2cm-4\tabcolsep-3\arrayrulewidth}|}
+		\hline
+		Sémantique
+		&
+		\mintinline{ocaml}{suppr_elem l e} renvoie la liste \mintinline{ocaml}{l} sans la première occurrence de l'élément \mintinline{ocaml}{e}. %La fonction est récursive et utilise le pattern matching.
+%
+		\\
+		\hline
+		Profile
+		&
+		\mintinline{ocaml}{suppr_elem: 'a list -> 'a -> 'a list}
+%
+		\\
+		\hline
+		Exemple
+		&
+		\begin{minted}{ocaml}
+suppr_elem ["Eric"; "Mathias"] "Mathias" = ["Eric"]
+		\end{minted}
+%
+		\\
+		\hline
+	\end{tabular}
+\end{center}
+
+\paragraph{Implémentation suppr\_elem}
+
+\begin{minted}[frame=single]{ocaml}
+let rec suppr_elem (l: 'a list) (e: 'a) : 'a list =
+	match l with
+	| [] -> []
+	| t::q -> if t=e then q else t::(suppr_elem q e);;
+\end{minted}
+
+\paragraph{Spécification deux\_premiers}
+
+\begin{center}
+	\begin{tabular}{|p{2cm}|p{\dimexpr\linewidth-2cm-4\tabcolsep-3\arrayrulewidth}|}
+		\hline
+		Sémantique
+		&
+		\mintinline{ocaml}{deux_premiers u lc} renvoie le couple de résultats des deux candidats qui possèdent le meilleur score parmi les bulletins d'une urne \mintinline{ocaml}{u} et les candidats d'un panel \mintinline{ocaml}{lc}. La fonction renvoie une erreur si le panel est vide. %La fonction utilise des fonctions définis précédemment.
+%
+		\\
+		\hline
+		Profile
+		&
+		\mintinline{ocaml}{deux_premiers: urne -> panel -> resultat*resultat}
+%
+		\\
+		\hline
+		Exemple
+		&
+		\begin{minted}{ocaml}
+deux_premiers ["Eric"; "Eric"; "Mathias"] ["Eric"; "Mathias"] = (("Eric", 2), ("Mathias", 1))
+deux_premiers ["Eric"; "Eric"; "Mathias"] [] = "Il n'y à pas de résultat."
+		\end{minted}
+%
+		\\
+		\hline
+	\end{tabular}
+\end{center}
+
+\paragraph{Implémentation deux\_premiers}
+
+\begin{minted}[frame=single]{ocaml}
+let deux_premiers (u: urne) (lc: panel) : resultat*resultat =
+	let (c1, s1)=(max_depouiller (depouiller lc u)) in
+		let c2=(max_depouiller (depouiller (suppr_elem lc c1) u)) in
+	((c1, s1), c2);;
+\end{minted}
+
+
+
+\subsection{Question 8}
+à remplir
+
+
+
+\subsection{Question 9}
+à remplir
+
+
+
+\section{Jugement majoritaire}
+
+\subsection{Question 10}
+
+Dans le cadre d'une élection avec 12 candidats il y a $ 6^{12} = 2176782336 $ bulletins possibles que l'on peut mettre dans l'urne.
+\\à compléter
+
+
+
+\subsection{Question 11}
+
+\begin{minted}[frame=single]{ocaml}
+type mention = Arejeter | Insuffisant | Passable | Assezbien | Bien | Tresbien;;
+type bulletin_jm = mention list;;
+type urne_jm = bulletin_jm list;;
+\end{minted}
+
+
+
+\subsection{Question 12}
+
+\begin{minted}[frame=single]{ocaml}
+let rec depouille_jm (u: urne_jm) : mention list list =
+	match u with
+	| [] -> []
+	| e -> (List.map (List.hd) u)::(
+		match (List.hd u) with
+		| [] -> []
+		| [e] -> []
+		| e -> depouille_jm (List.map (List.tl) u)
+	);;
+\end{minted}
+
+
+
+\subsection{Question 13}
+
+\begin{minted}[frame=single]{ocaml}
+let tri (l:'a list):'a list = List.sort compare l;;
+let tri_mentions (u: mention list list) : mention list list = List.map (tri) u;;
+\end{minted}
+
+
+
+\subsection{Question 14}
+
+\begin{minted}[frame=single]{ocaml}
+let mediane (l: 'a list) : 'a = List.nth l ((List.length l) / 2);;
+\end{minted}
+
+
+
+\subsection{Question 15}
+
+\begin{minted}[frame=single]{ocaml}
+let meilleur_mediane (u: mention list list) : mention =
+	let medList = List.map (mediane) (tri_mentions u) in
+		tri medList |> List.rev |> List.hd;;
+\end{minted}
+
+
+
+\subsection{Question 16}
+
+\begin{minted}[frame=single]{ocaml}
+let supprime_perdants (u: mention list list) : mention list list =
+	let med = meilleur_mediane u in
+		List.map (
+			fun (l: mention list ) : mention list -> if mediane l < med then [] else l
+		) u;;
+\end{minted}
+
+
+
+\subsection{Question 17}
+
+\begin{minted}[frame=single]{ocaml}
+let rec supprime_mention (l: mention list) (e: mention) : mention list =
+	match l with
+	| [] -> []
+	| t::q -> if t = e then q else t::(supprime_mention q e);;
+
+let supprime_meilleure_mediane (u: mention list list) : mention list list =
+	List.map (
+		fun (l: mention list) : mention list ->
+			if l = [] then [] else l |> mediane |> supprime_mention l
+	) u;;
+\end{minted}
+
+
+
+\subsection{Question 18}
+
+\begin{minted}[frame=single]{ocaml}
+	content...
+\end{minted}
+
+\end{document}
