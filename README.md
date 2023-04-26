@@ -1,4 +1,4 @@
-# projet_INF201
+# INF201-Projet
 Projet semestriel réalisé par :
 - Mathias Rivet
 - Léo Grange
