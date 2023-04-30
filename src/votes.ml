@@ -18,8 +18,12 @@ let rec depouiller lc u =
 
 (* Q2.4 *)
 let union r1 r2 =
-  let c1, s1 = r1 and c2, s2 = r2 in
-  if c1 = c2 then (c1, s1 + s2) else failwith "Les candidats sont différents."
+  let l1, l2 = (List.length r1, List.length r2) in
+  let gl, ll = if l1 > l2 then (r1, r2) else (r2, r1) in
+  let add_score (e, s) =
+    (e, match List.assoc_opt e ll with Some score -> score + s | None -> s)
+  in
+  List.map add_score gl
 
 (* Q2.5 *)
 let rec max_depouiller = function
@@ -68,13 +72,13 @@ let tri_mentions = List.map tri
 let mediane l = List.nth l (List.length l / 2)
 
 (* Q3.15 *)
-let meilleur_mediane u =
+let meilleure_mediane u =
   let medList = List.map mediane (tri_mentions u) in
   tri medList |> List.rev |> List.hd
 
 (* Q3.16 *)
 let supprime_perdants u =
-  let med = meilleur_mediane u in
+  let med = meilleure_mediane u in
   List.map (fun l -> if mediane l < med then [] else l) u
 
 (* Q3.17 *)

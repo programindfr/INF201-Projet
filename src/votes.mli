@@ -14,7 +14,7 @@ type resultat = candidat * score
 val depouiller : panel -> urne -> resultat list
 
 (* Q2.4 *)
-val union : resultat -> resultat -> resultat
+val union : resultat list -> resultat list -> resultat list
 
 (* Q2.5 *)
 val max_depouiller : resultat list -> resultat
@@ -44,7 +44,7 @@ val tri_mentions : mention list list -> mention list list
 val mediane : 'a list -> 'a
 
 (* Q3.15 *)
-val meilleur_mediane : mention list list -> mention
+val meilleure_mediane : mention list list -> mention
 
 (* Q3.16 *)
 val supprime_perdants : mention list list -> mention list list
