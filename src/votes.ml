@@ -72,13 +72,13 @@ let tri_mentions = List.map tri
 let mediane l = List.nth l (List.length l / 2)
 
 (* Q3.15 *)
-let meilleur_mediane u =
+let meilleure_mediane u =
   let medList = List.map mediane (tri_mentions u) in
   tri medList |> List.rev |> List.hd
 
 (* Q3.16 *)
 let supprime_perdants u =
-  let med = meilleur_mediane u in
+  let med = meilleure_mediane u in
   List.map (fun l -> if mediane l < med then [] else l) u
 
 (* Q3.17 *)

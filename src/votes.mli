@@ -44,7 +44,7 @@ val tri_mentions : mention list list -> mention list list
 val mediane : 'a list -> 'a
 
 (* Q3.15 *)
-val meilleur_mediane : mention list list -> mention
+val meilleure_mediane : mention list list -> mention
 
 (* Q3.16 *)
 val supprime_perdants : mention list list -> mention list list
