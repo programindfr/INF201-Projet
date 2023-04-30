@@ -52,3 +52,6 @@ val supprime_perdants : mention list list -> mention list list
 (* Q3.17 *)
 val supprime_mention : mention -> mention list -> mention list
 val supprime_meilleure_mediane : mention list list -> mention list list
+
+(* Q3.18 *)
+val vainqueur_jm : panel -> mention list list -> string
