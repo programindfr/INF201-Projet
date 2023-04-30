@@ -14,7 +14,7 @@ type resultat = candidat * score
 val depouiller : panel -> urne -> resultat list
 
 (* Q2.4 *)
-val union : resultat -> resultat -> resultat
+val union : resultat list -> resultat list -> resultat list
 
 (* Q2.5 *)
 val max_depouiller : resultat list -> resultat
