@@ -104,3 +104,6 @@ let rec vainqueur_jm p ms =
     in
     fw ms
   else vainqueur_jm p n
+
+(* Q3.19 *)
+let trouve_vainqueur_jm p u = depouille_jm u |> vainqueur_jm p
