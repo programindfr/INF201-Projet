@@ -1,15 +1,8 @@
 \documentclass[french, 10pt, a4paper]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-%\usepackage{lmodern}
-%\renewcommand{\familydefault}{\sfdefault}
-
-\usepackage{fontspec}
-\setmonofont{Fira Code}[
-	Contextuals=Alternate
-]
-
-
+\usepackage{lmodern}
+\renewcommand{\familydefault}{\sfdefault}
 \usepackage[margin=2cm]{geometry}
 \usepackage{babel}
 
@@ -34,6 +27,7 @@
 \title{Compte-rendu du projet Comment voter ?}
 \author{
 	Mathias Rivet
+	Léo Grange
 }
 
 
@@ -453,8 +447,23 @@ let supprime_meilleure_mediane (u: mention list list) : mention list list =
 
 \subsection{Question 18}
 
+La fonction \mintinline{ocaml}{vainqueur_jm p ms} applique la fonction \mintinline{ocaml}{supprime_perdants u} tant que tous les candidats n'ont pas tous la même médiane. Ensuite la fonction \mintinline{ocaml}{supprime_meilleure_mediane u} est appliquée jusqu'au moment ou il ne reste plus qu'un seul candidat ou que la médiane d'un candidat soit supérieurs à toutes les autres.
+
 \begin{minted}[frame=single]{ocaml}
-	content...
+let rec vainqueur_jm (p: panel) (ms: urne_jm) : candidat =
+	let n = supprime_meilleure_mediane ms in
+	if List.for_all (fun l -> l = []) n then
+		let ln = List.length ms in
+		let rec fw = function
+			| [] -> ""
+			| hd :: tl -> (
+				match hd with
+				| [] -> fw tl
+				| [ _ ] -> List.length (hd :: tl) - ln |> List.nth p
+				| _ -> assert false)
+		in
+		fw ms
+	else vainqueur_jm p n
 \end{minted}
 
 \end{document}

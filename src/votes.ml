@@ -88,3 +88,19 @@ let rec supprime_mention e = function
 
 let supprime_meilleure_mediane =
   List.map @@ function [] -> [] | l -> supprime_mention (mediane l) l
+
+(* Q3.18 *)
+let rec vainqueur_jm p ms =
+  let n = supprime_meilleure_mediane ms in
+  if List.for_all (fun l -> l = []) n then
+    let ln = List.length ms in
+    let rec fw = function
+      | [] -> ""
+      | hd :: tl -> (
+          match hd with
+          | [] -> fw tl
+          | [ _ ] -> List.length (hd :: tl) - ln |> List.nth p
+          | _ -> assert false)
+    in
+    fw ms
+  else vainqueur_jm p n

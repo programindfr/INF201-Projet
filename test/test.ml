@@ -77,3 +77,6 @@ let () =
   assert (
     supprime_mention Tresbien @@ List.nth ms_triee 1
     = [ Arejeter; Assezbien; Assezbien ])
+
+(* Q3.18 *)
+let () = assert (vainqueur_jm lc2 ms_triee = "Eric")
