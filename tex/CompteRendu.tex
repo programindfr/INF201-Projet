@@ -466,4 +466,42 @@ let rec vainqueur_jm (p: panel) (ms: urne_jm) : candidat =
 	else vainqueur_jm p n
 \end{minted}
 
+
+
+\subsection{Question 19}
+
+
+
+
+\subsection{Question 20}
+
+
+
+
+\section{Recomptons les voix}
+
+\subsection{Question 21}
+
+\begin{minted}[frame=single]{ocaml}
+type ville = string;;
+type zone = Dpt of string | Reg of string;;
+type arbre =
+	| N of zone * arbre list
+	| Bv of ville * (string * int) list;;
+\end{minted}
+
+
+
+\subsection{Question 22}
+
+
+
+
+\subsection{Question 23}
+
+
+
+
+\section{Conclusion}
+
 \end{document}
