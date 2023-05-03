@@ -450,26 +450,28 @@ let supprime_meilleure_mediane (u: mention list list) : mention list list =
 La fonction \mintinline{ocaml}{vainqueur_jm p ms} applique la fonction \mintinline{ocaml}{supprime_perdants u} tant que tous les candidats n'ont pas tous la même médiane. Ensuite la fonction \mintinline{ocaml}{supprime_meilleure_mediane u} est appliquée jusqu'au moment ou il ne reste plus qu'un seul candidat ou que la médiane d'un candidat soit supérieurs à toutes les autres.
 
 \begin{minted}[frame=single]{ocaml}
-let rec vainqueur_jm (p: panel) (ms: urne_jm) : candidat =
-	let n = supprime_meilleure_mediane ms in
-	if List.for_all (fun l -> l = []) n then
-		let ln = List.length ms in
-		let rec fw = function
-			| [] -> ""
-			| hd :: tl -> (
-				match hd with
-				| [] -> fw tl
-				| [ _ ] -> List.length (hd :: tl) - ln |> List.nth p
-				| _ -> assert false)
-		in
-		fw ms
-	else vainqueur_jm p n
+let mediane (l: bulletin_jm) : mention = if l = [] then Arejeter else List.nth l ((List.length l) / 2);;
+
+let candidats_restants (l: bulletin_jm list) : int =
+	List.fold_left (fun (x: int) (y: bulletin_jm) -> if y = [] then 0 else 1) 0 l;; 
+
+let rec vainqueur (candidats: candidat list) (l: 'a list) : candidat =
+	if (List.hd l) = [] then vainqueur (List.tl candidats) (List.tl l) else (List.hd candidats);;
+
+let rec vainqueur_jm (lc: panel) (l: bulletin_jm list) : string = 
+	let l_gagnants = supprime_perdants (tri_mentions l) in
+		if candidats_restants l_gagnants = 0 then "" else
+			if candidats_restants l_gagnants = 1 then vainqueur lc l_gagnants else 
+				vainqueur_jm (lc: panel) (supprime_meilleure_mediane l_gagnants);;
 \end{minted}
 
 
 
 \subsection{Question 19}
 
+\begin{minted}[frame=single]{ocaml}
+vainqueur_jm lc (depouille_jm u)
+\end{minted}
 
 
 
