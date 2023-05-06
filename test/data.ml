@@ -285,3 +285,163 @@ let (ujm3 : urne_jm) =
     [ Arejeter; Assezbien; Bien; Passable; Tresbien; Bien ];
     [ Bien; Bien; Bien; Assezbien; Tresbien; Passable ];
   ]
+
+(* Résultat élection présidentielle 2022 - Auvergne-Rhône-Alpes *)
+let bv_gieres =
+  [
+    ("ARTHAUD", 16);
+    ("ROUSSEL", 66);
+    ("MACRON", 1071);
+    ("LASSALLE", 84);
+    ("LE PEN", 641);
+    ("ZEMMOUR", 205);
+    ("MÉLENCHON", 844);
+    ("HIDALGO", 96);
+    ("JADOT", 301);
+    ("PÉCRESSE", 155);
+    ("POUTOU", 30);
+    ("DUPONT-AIGNAN", 61);
+  ]
+
+let ara =
+  N
+    ( Reg "Auvergne-Rhône-Alpes",
+      [
+        N
+          ( Dpt "Drôme",
+            [
+              Bv
+                ( "Valence",
+                  [
+                    ("ARTHAUD", 161);
+                    ("ROUSSEL", 595);
+                    ("MACRON", 7756);
+                    ("LASSALLE", 590);
+                    ("LE PEN", 4679);
+                    ("ZEMMOUR", 2080);
+                    ("MÉLENCHON", 8398);
+                    ("HIDALGO", 519);
+                    ("JADOT", 1701);
+                    ("PÉCRESSE", 1423);
+                    ("POUTOU", 186);
+                    ("DUPONT-AIGNAN", 573);
+                  ] );
+              Bv
+                ( "Romans-sur-Isère",
+                  [
+                    ("ARTHAUD", 181);
+                    ("ROUSSEL", 371);
+                    ("MACRON", 4030);
+                    ("LASSALLE", 334);
+                    ("LE PEN", 3270);
+                    ("ZEMMOUR", 1072);
+                    ("MÉLENCHON", 4108);
+                    ("HIDALGO", 251);
+                    ("JADOT", 850);
+                    ("PÉCRESSE", 631);
+                    ("POUTOU", 111);
+                    ("DUPONT-AIGNAN", 341);
+                  ] );
+            ] );
+        N
+          ( Dpt "Isère",
+            [
+              Bv
+                ( "Meylan",
+                  [
+                    ("ARTHAUD", 28);
+                    ("ROUSSEL", 169);
+                    ("MACRON", 4457);
+                    ("LASSALLE", 164);
+                    ("LE PEN", 1288);
+                    ("ZEMMOUR", 928);
+                    ("MÉLENCHON", 2198);
+                    ("HIDALGO", 251);
+                    ("JADOT", 906);
+                    ("PÉCRESSE", 763);
+                    ("POUTOU", 64);
+                    ("DUPONT-AIGNAN", 162);
+                  ] );
+              Bv
+                ( "Echirolles",
+                  [
+                    ("ARTHAUD", 104);
+                    ("ROUSSEL", 506);
+                    ("MACRON", 3276);
+                    ("LASSALLE", 259);
+                    ("LE PEN", 2737);
+                    ("ZEMMOUR", 779);
+                    ("MÉLENCHON", 5121);
+                    ("HIDALGO", 223);
+                    ("JADOT", 590);
+                    ("PÉCRESSE", 360);
+                    ("POUTOU", 92);
+                    ("DUPONT-AIGNAN", 202);
+                  ] );
+              Bv
+                ( "Fontaine",
+                  [
+                    ("ARTHAUD", 55);
+                    ("ROUSSEL", 363);
+                    ("MACRON", 2111);
+                    ("LASSALLE", 146);
+                    ("LE PEN", 1835);
+                    ("ZEMMOUR", 541);
+                    ("MÉLENCHON", 3113);
+                    ("HIDALGO", 185);
+                    ("JADOT", 493);
+                    ("PÉCRESSE", 212);
+                    ("POUTOU", 83);
+                    ("DUPONT-AIGNAN", 121);
+                  ] );
+              Bv
+                ( "Saint-Martin-d'Hères",
+                  [
+                    ("ARTHAUD", 58);
+                    ("ROUSSEL", 436);
+                    ("MACRON", 2769);
+                    ("LASSALLE", 207);
+                    ("LE PEN", 2289);
+                    ("ZEMMOUR", 661);
+                    ("MÉLENCHON", 4763);
+                    ("HIDALGO", 242);
+                    ("JADOT", 777);
+                    ("PÉCRESSE", 300);
+                    ("POUTOU", 119);
+                    ("DUPONT-AIGNAN", 161);
+                  ] );
+              Bv ("Gières", bv_gieres);
+              Bv
+                ( "Grenoble",
+                  [
+                    ("ARTHAUD", 256);
+                    ("ROUSSEL", 1300);
+                    ("MACRON", 15968);
+                    ("LASSALLE", 845);
+                    ("LE PEN", 6444);
+                    ("ZEMMOUR", 3389);
+                    ("MÉLENCHON", 24568);
+                    ("HIDALGO", 1488);
+                    ("JADOT", 5644);
+                    ("PÉCRESSE", 2019);
+                    ("POUTOU", 508);
+                    ("DUPONT-AIGNAN", 661);
+                  ] );
+            ] );
+      ] )
+
+let panel_2022 =
+  [
+    "ARTHAUD";
+    "ROUSSEL";
+    "MACRON";
+    "LASSALLE";
+    "LE PEN";
+    "ZEMMOUR";
+    "MÉLENCHON";
+    "HIDALGO";
+    "JADOT";
+    "PÉCRESSE";
+    "POUTOU";
+    "DUPONT-AIGNAN";
+  ]

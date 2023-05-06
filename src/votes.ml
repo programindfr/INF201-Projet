@@ -90,17 +90,32 @@ let supprime_meilleure_mediane =
   List.map @@ function [] -> [] | l -> supprime_mention (mediane l) l
 
 (* Q3.18 *)
-let rec vainqueur_jm p ms =
-  let n = supprime_meilleure_mediane ms in
-  if List.for_all (fun l -> l = []) n then
-    let ln = List.length ms in
-    let rec fw = function
-      | [] -> ""
-      | hd :: tl -> (
-          match hd with
-          | [] -> fw tl
-          | [ _ ] -> List.length (hd :: tl) - ln |> List.nth p
-          | _ -> assert false)
-    in
-    fw ms
-  else vainqueur_jm p n
+let candidats_restants l =
+  List.fold_left (fun _ y -> if y = [] then 0 else 1) 0 l
+
+let rec vainqueur candidats l =
+  if List.hd l = [] then vainqueur (List.tl candidats) (List.tl l)
+  else List.hd candidats
+
+let rec vainqueur_jm lc l =
+  let l_gagnants = tri_mentions l |> supprime_perdants in
+  match candidats_restants l_gagnants with
+  | 0 -> ""
+  | 1 -> vainqueur lc l_gagnants
+  | _ -> supprime_meilleure_mediane l_gagnants |> vainqueur_jm lc
+
+(* Q3.19 *)
+let trouve_vainqueur_jm lc u = depouille_jm u |> vainqueur_jm lc
+
+(* Q4.21 *)
+type ville = string
+type zone = Dpt of string | Reg of string
+type arbre = N of zone * arbre list | Bv of ville * resultat list
+
+(* Q4.22 *)
+let rec trouve_bv l ville =
+  List.fold_left
+    (fun results -> function
+      | N (_, a) -> results @ trouve_bv a ville
+      | Bv (v, r) -> if v = ville then r @ results else results)
+    [] l

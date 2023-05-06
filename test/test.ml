@@ -80,3 +80,14 @@ let () =
 
 (* Q3.18 *)
 let () = assert (vainqueur_jm lc2 ms_triee = "Eric")
+
+(* Q4.22 *)
+let () = assert (trouve_bv [ ara ] "Gières" = bv_gieres)
+
+(* Q4.23 *)
+let () =
+  assert (
+    union
+      (union (trouve_bv [ ara ] "Grenoble") (trouve_bv [ ara ] "Fontaine"))
+      (trouve_bv [ ara ] "Valence")
+    |> max_depouiller |> fst = "MÉLENCHON")
