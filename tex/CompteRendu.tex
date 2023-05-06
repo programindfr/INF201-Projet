@@ -27,8 +27,9 @@
 \title{Compte-rendu du projet Comment voter ?}
 \author{
 	Mathias Rivet\\
+	Arthur Lepley\\
 	Léo Grange\\
-	Arthur Lepley
+	Maël Perrier
 }
 
 
@@ -36,7 +37,7 @@
 \begin{document}
 	\maketitle
 
-	Les codes sources sont aussi disponible à l'adresse : \href{https://github.com/programindfr/INF201-Projet}{https://github.com/programindfr/INF201-Projet}
+	Les codes sources plus précis et des tests sont disponible à l'adresse : \href{https://github.com/programindfr/INF201-Projet}{https://github.com/programindfr/INF201-Projet}
 
 	\tableofcontents
 
@@ -133,6 +134,7 @@ depouiller ["Eric"; "Mathias"] ["Eric"; "Eric"] = [("Eric", 2); ("Mathias", 0)]
 
 \begin{minted}[frame=single]{ocaml}
 type resultat = candidat*score;;
+
 let rec depouiller (lc: panel) (u: urne) : resultat list =
 	match lc with
 	| [] -> []
@@ -450,19 +452,19 @@ let supprime_meilleure_mediane (u: mention list list) : mention list list =
 La fonction \mintinline{ocaml}{vainqueur_jm p ms} applique la fonction \mintinline{ocaml}{supprime_perdants u} tant que tous les candidats n'ont pas tous la même médiane. Ensuite la fonction \mintinline{ocaml}{supprime_meilleure_mediane u} est appliquée jusqu'au moment ou il ne reste plus qu'un seul candidat ou que la médiane d'un candidat soit supérieurs à toutes les autres.
 
 \begin{minted}[frame=single]{ocaml}
-let mediane (l: bulletin_jm) : mention = if l = [] then Arejeter else List.nth l ((List.length l) / 2);;
+let candidats_restants l =
+	List.fold_left (fun _ y -> if y = [] then 0 else 1) 0 l;;
 
-let candidats_restants (l: bulletin_jm list) : int =
-	List.fold_left (fun (x: int) (y: bulletin_jm) -> if y = [] then 0 else 1) 0 l;; 
+let rec vainqueur candidats l =
+	if List.hd l = [] then vainqueur (List.tl candidats) (List.tl l)
+	else List.hd candidats;;
 
-let rec vainqueur (candidats: candidat list) (l: 'a list) : candidat =
-	if (List.hd l) = [] then vainqueur (List.tl candidats) (List.tl l) else (List.hd candidats);;
-
-let rec vainqueur_jm (lc: panel) (l: bulletin_jm list) : string = 
-	let l_gagnants = supprime_perdants (tri_mentions l) in
-		if candidats_restants l_gagnants = 0 then "" else
-			if candidats_restants l_gagnants = 1 then vainqueur lc l_gagnants else 
-				vainqueur_jm (lc: panel) (supprime_meilleure_mediane l_gagnants);;
+let rec vainqueur_jm lc l =
+	let l_gagnants = tri_mentions l |> supprime_perdants in
+	match candidats_restants l_gagnants with
+	| 0 -> ""
+	| 1 -> vainqueur lc l_gagnants
+	| _ -> supprime_meilleure_mediane l_gagnants |> vainqueur_jm lc;;
 \end{minted}
 
 
@@ -470,13 +472,14 @@ let rec vainqueur_jm (lc: panel) (l: bulletin_jm list) : string =
 \subsection{Question 19}
 
 \begin{minted}[frame=single]{ocaml}
-vainqueur_jm lc (depouille_jm u)
+let trouve_vainqueur_jm lc u = depouille_jm u |> vainqueur_jm lc;;
 \end{minted}
 
 
 
 \subsection{Question 20}
 
+Le jugement majoritaire résout le problème du vote utile car chaque votant a la possibilité d'exprimer son opinion sur chaque candidat, sans devoir choisir entre plusieurs candidats qu'il supporte ou devoir ne pas voter pour quelqu'un qui a peu de chances de gagner. Cependant, pour voter, chaque votant devrait s'informer sur chacun des différents candidats avant de voter, ce qui ne serait pas souvent le cas en pratique.
 
 
 
@@ -487,23 +490,32 @@ vainqueur_jm lc (depouille_jm u)
 \begin{minted}[frame=single]{ocaml}
 type ville = string;;
 type zone = Dpt of string | Reg of string;;
-type arbre =
-	| N of zone * arbre list
-	| Bv of ville * (string * int) list;;
+type arbre = N of zone * arbre list | Bv of ville * resultat list;;
 \end{minted}
 
 
 
 \subsection{Question 22}
 
+\begin{minted}[frame=single]{ocaml}
+let rec trouve_bv l ville =
+	List.fold_left
+		(fun results -> function
+			| N (_, a) -> results @ trouve_bv a ville
+			| Bv (v, r) -> if v = ville then r @ results else results)
+		[] l;;
+\end{minted}
 
 
 
 \subsection{Question 23}
 
+Le vainqueur semble être \mintinline{ocaml}{"MÉLENCHON"}.
 
 
 
 \section{Conclusion}
+
+Le scrutin uninominal, avec lequel nous sommes familiers, est un système direct et relativement simple. Mais les votants sont limités à un vote unique, ce qui donne lieu à des limitations. Voter pour un candidat peu connu peut sembler inutile, peu importe si il est favori, pour un individu. Le jugement majoritaire s'adresse à ce problème en offrant un "vote" par candidat et incite aussi à donner une opinion honnête plutôt que choisir les extrêmes pour influencer le tirage, en utilisant la médiane. Cependant, ce mode de fonctionnement rend le traitement de dizaines de millions de votes beaucoup plus compliqué et part du principe que les votants vont s'informer sur chacun des candidats.
 
 \end{document}
