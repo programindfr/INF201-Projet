@@ -55,3 +55,14 @@ val supprime_meilleure_mediane : mention list list -> mention list list
 
 (* Q3.18 *)
 val vainqueur_jm : panel -> urne_jm -> candidat
+
+(* Q3.19 *)
+val trouve_vainqueur_jm : panel -> urne_jm -> candidat
+
+(* Q3.21 *)
+type ville = string
+type zone = Dpt of string | Reg of string
+type arbre = N of zone * arbre list | Bv of ville * resultat list
+
+(* Q3.22 *)
+val trouve_bv : arbre list -> ville -> resultat list
